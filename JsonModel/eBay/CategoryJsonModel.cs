@@ -1,13 +1,9 @@
 
-
-namespace MVC_API_Client.Service;
+namespace MVC_API_Client.JsonModel.eBay;
 
 using System;
 using System.Collections.Generic;
-
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Globalization;
 
 public partial class CategoryJsonModel
 {

@@ -1,23 +1,22 @@
-using static MVC_API_Client.Service.CategoryJsonModel;
-// using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System.Text.Json;
 using System.Net.Http.Headers;
-using System.Reflection;
+using MVC_API_Client.JsonModel.eBay;
 
-namespace MVC_API_Client.Service;
+namespace MVC_API_Client.Service.eBay;
 
 public class EbayClient
 {
     private readonly HttpClient _httpClient;
-    public EbayClient(HttpClient httpClient)
+    private readonly EbayOAuth _eBayOAuthClient;
+    public EbayClient(HttpClient httpClient, EbayOAuth ebayOAuthClient)
     {
         _httpClient = httpClient;
+        _eBayOAuthClient = ebayOAuthClient;
     }
 
     public async Task<List<Category>> GetSubcategories(string parentId, int limit)
     {
-        string accessToken =  await EbayOAuth.GetAccessTokenAsync();
+        string accessToken =  await _eBayOAuthClient.GetAccessTokenAsync();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         HttpResponseMessage response = await _httpClient.GetAsync($"https://api.ebay.com/commerce/taxonomy/v1/category_tree/15/get_category_subtree?category_id={parentId}");
         string jsonString = await response.Content.ReadAsStringAsync();
@@ -44,7 +43,7 @@ public class EbayClient
 
     public async Task<List<ProductBasicInfo>> SearchProductsByCategory(string categoryID, int limit)
     {
-        string accessToken =  await EbayOAuth.GetAccessTokenAsync();
+        string accessToken =  await _eBayOAuthClient.GetAccessTokenAsync();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         
         HttpResponseMessage response = await _httpClient.GetAsync($"https://api.ebay.com/buy/browse/v1/item_summary/search?category_ids={categoryID}&limit={limit}");

@@ -1,12 +1,9 @@
 using System.Diagnostics;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC_API_Client.Models;
-using MVC_API_Client.Service;
-using static MVC_API_Client.Service.EbayClient;
+using MVC_API_Client.Service.eBay;
 
 namespace MVC_API_Client.Controllers;
 
@@ -42,6 +39,12 @@ public class HomeController : Controller
     public IActionResult Privacy()
     {
         return View();
+    }
+
+    public IActionResult ContactInfo()
+    {
+        ContactInfoViewModel model = new ContactInfoViewModel();
+        return View(model);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

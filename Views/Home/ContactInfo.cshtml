@@ -1,0 +1,52 @@
+﻿@model ContactInfoViewModel
+@{
+    ViewData["Title"] = "Contact Info";
+}
+
+<div class="container mt-5">
+
+    <!-- Title Section -->
+    <h1 class="text-center mb-4">Let's Connect!</h1>
+
+    <!-- Contact Info Section -->
+    <div class="contact-info-container mt-5">
+        <h3 class="text-center">Where to Reach Me</h3>
+        <div class="row">
+            <!-- GitHub -->
+            <div class="col-md-4">
+                <div class="info-container">
+                    <h5>GitHub</h5>
+                    <p>Check out my projects and repositories on <a href="@Model.MyGithub" target="_blank">GitHub</a>.</p>
+                </div>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="col-md-4">
+                <div class="info-container">
+                    <h5>LinkedIn</h5>
+                    <p>Connect with me professionally on <a href="@Model.MyLinkedin" target="_blank">LinkedIn</a>.</p>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-4">
+                <div class="info-container">
+                    <h5>Email</h5>
+                    <p>Feel free to reach out to me via email at <a href="mailto:@Model.MyEmail">@Model.MyEmail</a>.</p>
+                </div>
+            </div>
+
+            <!-- Personal Portfolio -->
+            <div class="col-md-4 demo-disabled" id="portfolio-card">
+                <div class="info-container">
+                    <h5>Portfolio</h5>
+                    <p>Currently working on it</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="~/css/style.css">
+<script src="~/js/site.js"></script>
+
+

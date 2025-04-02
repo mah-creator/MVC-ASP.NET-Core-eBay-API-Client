@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using static MVC_API_Client.Service.EbayClient;
+using static MVC_API_Client.Service.eBay.EbayClient;
 
 namespace MVC_API_Client.Models;
 
