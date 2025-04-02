@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Net.Http.Headers;
 using MVC_API_Client.Service.eBay;
 
@@ -39,6 +40,9 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// Use static web assets in environments other that Development
+StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 app.MapControllerRoute(
     name: "default",
