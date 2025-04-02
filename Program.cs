@@ -41,7 +41,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-// Use static web assets in environments other that Development
+// Use static web assets in environments other than Development
 StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
 
 app.MapControllerRoute(

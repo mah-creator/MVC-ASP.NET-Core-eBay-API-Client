@@ -6,6 +6,8 @@ namespace MVC_API_Client.Service.eBay;
 
 public class EbayClient
 {
+    private const int SUBCATEGORY_LIMIT = 4;
+    private const int ITEM_LIMIT = 3;
     private readonly HttpClient _httpClient;
     private readonly EbayOAuth _eBayOAuthClient;
     public EbayClient(HttpClient httpClient, EbayOAuth ebayOAuthClient)
@@ -14,7 +16,7 @@ public class EbayClient
         _eBayOAuthClient = ebayOAuthClient;
     }
 
-    public async Task<List<Category>> GetSubcategories(string parentId, int limit)
+    public async Task<List<Category>> GetSubcategories(string parentId)
     {
         string accessToken =  await _eBayOAuthClient.GetAccessTokenAsync();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
@@ -24,13 +26,11 @@ public class EbayClient
         if(response.IsSuccessStatusCode)
         {
             CategoryJsonModel? categoryJsonModel = JsonSerializer.Deserialize<CategoryJsonModel>(jsonString);
-            int i = 0;
             
-            var demoSubcategoryList = categoryJsonModel.CategorySubtreeNode.ChildCategoryTreeNodes[0..limit];
+            var demoSubcategoryList = categoryJsonModel.CategorySubtreeNode.ChildCategoryTreeNodes[0..SUBCATEGORY_LIMIT];
             foreach (TreeNode childCategoryTreeNode in demoSubcategoryList)
             {
                 subcategories.Add(childCategoryTreeNode.Category);
-                if(++i >= limit) break;
             }
         }
         else
@@ -41,12 +41,12 @@ public class EbayClient
         return subcategories;
     }
 
-    public async Task<List<ProductBasicInfo>> SearchProductsByCategory(string categoryID, int limit)
+    public async Task<List<ProductBasicInfo>> SearchProductsByCategory(string categoryID)
     {
         string accessToken =  await _eBayOAuthClient.GetAccessTokenAsync();
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         
-        HttpResponseMessage response = await _httpClient.GetAsync($"https://api.ebay.com/buy/browse/v1/item_summary/search?category_ids={categoryID}&limit={limit}");
+        HttpResponseMessage response = await _httpClient.GetAsync($"https://api.ebay.com/buy/browse/v1/item_summary/search?category_ids={categoryID}&limit={ITEM_LIMIT}");
         string jsonString = await response.Content.ReadAsStringAsync();
         List<ProductBasicInfo> products = new List<ProductBasicInfo>();
         if(response.IsSuccessStatusCode)

@@ -9,7 +9,6 @@ namespace MVC_API_Client.Controllers;
 
 public class HomeController : Controller
 {
-    private const int MAX_SUBCATS = 3;
     private readonly ILogger<HomeController> _logger;
     private readonly EbayClient _ebayClient;
     private IndexViewModel _indexViewModel;
@@ -54,14 +53,14 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public string Test(int selectedValue)
+    public string GetSubcategories(int selectedValue)
     {
-        return JsonSerializer.Serialize(_ebayClient.GetSubcategories(selectedValue+"", MAX_SUBCATS));
+        return JsonSerializer.Serialize(_ebayClient.GetSubcategories(selectedValue+""));
     }
 
     [HttpGet]
-    public async Task<string> Test2(int selectedValue)
+    public async Task<string> GetItems(int selectedValue)
     {
-        return JsonSerializer.Serialize(_ebayClient.SearchProductsByCategory(selectedValue+"", MAX_SUBCATS));
+        return JsonSerializer.Serialize(_ebayClient.SearchProductsByCategory(selectedValue+""));
     }
 }

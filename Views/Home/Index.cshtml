@@ -66,27 +66,6 @@
                         <a href="@product.ProductUrl" class="btn btn-primary">View Details</a>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="@Model.PRODUCT_IMAGE_LINK" class="card-img-top" alt="IMAGEALT_FILL_HERE">
-                    <div class="card-body">
-                        <h5 class="card-title">@Model.TEST_PRODUCT_NAME</h5>
-                        <p class="card-text">@Model.TEST_PRODUCT_PRICE</p>
-                        <a href="@Model.PRODUCT_LINK" class="btn btn-primary">View Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card">
-                    <img src="@Model.PRODUCT_IMAGE_LINK" class="card-img-top" alt="IMAGEALT_FILL_HERE">
-                    <div class="card-body">
-                        <h5 class="card-title">@Model.TEST_PRODUCT_NAME</h5>
-                        <p class="card-text">@Model.TEST_PRODUCT_PRICE</p>
-                        <a href="@Model.PRODUCT_LINK" class="btn btn-primary">View Details</a>
-                    </div>
-                </div>
             </div> *@
         </div>
     </div>
@@ -101,7 +80,7 @@
         {
         document.getElementById("resultRow").style = "display: none";
         $.ajax({
-            url: '@Url.Action("Test", "Home")', // URL to your controller action
+            url: '@Url.Action("GetSubcategories", "Home")', // URL to your controller action
             type: 'GET', // or 'POST' depending on your requirement
             data: { selectedValue: selectedValue }, // Pass selected value to the action
             dataType: 'json', // Specify that the response will be in JSON format
@@ -138,7 +117,7 @@
         document.getElementById("resultRow").style = "display: flex";
         document.getElementById("resultRow").innerHTML = ""
         $.ajax({
-            url: '@Url.Action("Test2", "Home")', // URL to your controller action
+            url: '@Url.Action("GetItems", "Home")', // URL to your controller action
             type: 'GET', // or 'POST' depending on your requirement
             data: { selectedValue: selectedValue }, // Pass selected value to the action
             dataType: 'json', // Specify that the response will be in JSON format
