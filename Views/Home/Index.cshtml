@@ -1,0 +1,209 @@
+﻿@model IndexViewModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+<!-- Main Container -->
+<div class="container mt-5">
+
+    <!-- Title Section -->
+    <h1 class="text-center mb-4">Search eBay by Criteria</h1>
+
+    <!-- Search Filter Section -->
+    <div class="filter-section">
+        <form id="searchForm" action="" method="GET">
+            <div class="row">
+                <!-- Marketplace Filter -->
+                <div class="col-md-4">
+                    <div class="filterCriteriaContainer" id="market-place-container">
+                        <label for="market-place">Marketplace</label>
+                        <select title="Disabled for demo purposes" name="Marketplace" id="market-place" class="form-control demo-disabled" disabled>
+                            <option value="AU">AU</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="filterCriteriaContainer" id="category-container">
+                        <label for="category">Category</label>
+                        <select name="Category" id="category" class="form-control" onchange="onCategoryChange()">
+                            <option value="0">-- select a category --</option>
+                            <option value="58058">Computers/Tablets & Networking</option>
+                            <option value="267">Books</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Subcategory Filter -->
+                <div class="col-md-4">
+                    <div class="filterCriteriaContainer" id="subcategory-container">
+                        <label for="subcategory">Subcategory</label>
+                        <select name="Subcategory" id="subcategory" class="form-control" onchange="onSubcategoryChange()">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Button -->
+            @* <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div> *@
+        </form>
+    </div>
+
+    <!-- Product Results Section -->
+    <div id="resultContainer" class="mt-5" style="display: @Model.TEST_RESULT_VISIBILITY;">
+        <h3 class="text-center">Search Results</h3>
+        <p class="text-center">Here will be the search results based on the selected filters.</p>
+
+        <!-- Example Product Cards (replace with dynamic data) -->
+        <div class="row" id="resultRow">
+            @* <div class="col-md-4">
+                <div class="card">
+                    <img src="@product.ImageUrl" class="card-img-top" alt="IMAGEALT_FILL_HERE">
+                    <div class="card-body">
+                        <h5 class="card-title">@product.Title</h5>
+                        <p class="card-text">@product.Price</p>
+                        <a href="@product.ProductUrl" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="@Model.PRODUCT_IMAGE_LINK" class="card-img-top" alt="IMAGEALT_FILL_HERE">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.TEST_PRODUCT_NAME</h5>
+                        <p class="card-text">@Model.TEST_PRODUCT_PRICE</p>
+                        <a href="@Model.PRODUCT_LINK" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <img src="@Model.PRODUCT_IMAGE_LINK" class="card-img-top" alt="IMAGEALT_FILL_HERE">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.TEST_PRODUCT_NAME</h5>
+                        <p class="card-text">@Model.TEST_PRODUCT_PRICE</p>
+                        <a href="@Model.PRODUCT_LINK" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div> *@
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="~/css/style.css">
+
+<script type="text/javascript">
+    function onCategoryChange() {
+        var selectedValue = $('#category').val();
+        if(selectedValue != 0)
+        {
+        document.getElementById("resultRow").style = "display: none";
+        $.ajax({
+            url: '@Url.Action("Test", "Home")', // URL to your controller action
+            type: 'GET', // or 'POST' depending on your requirement
+            data: { selectedValue: selectedValue }, // Pass selected value to the action
+            dataType: 'json', // Specify that the response will be in JSON format
+            success: function (data) {
+                var subcategoryDropdown = document.getElementById("subcategory");
+                document.querySelectorAll("#subcategory option").forEach(option => option.remove())
+                let resArrayObj = data.Result;
+                let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+
+                @*  render the following option as the first option
+                    <option value="0">-- select a category --</option> 
+                *@
+                var selectSubcategoryOption = document.createElement("option"); selectSubcategoryOption.value = 0; selectSubcategoryOption.textContent = "-- select a subcategory --";
+                subcategoryDropdown.appendChild(selectSubcategoryOption);
+                resArray.forEach(subcategory => {
+                    var option = document.createElement("option");
+                    option.value = subcategory.categoryId;
+                    option.textContent = subcategory.categoryName;
+                    subcategoryDropdown.appendChild(option);
+                });
+                
+                
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+        }
+    }
+    function onSubcategoryChange() {
+        var selectedValue = $('#subcategory').val();
+        if(selectedValue != 0)
+        {
+        document.getElementById("resultRow").style = "display: flex";
+        document.getElementById("resultRow").innerHTML = ""
+        $.ajax({
+            url: '@Url.Action("Test2", "Home")', // URL to your controller action
+            type: 'GET', // or 'POST' depending on your requirement
+            data: { selectedValue: selectedValue }, // Pass selected value to the action
+            dataType: 'json', // Specify that the response will be in JSON format
+            success: function (data) {
+                var subcategoryDropdown = document.getElementById("subcategory");
+                let resArrayObj = data.Result;
+                let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+
+                resArray.forEach(product => {
+                    var htmlProductCard = generateComplexHtml(
+                        product.Title, product.Price, 
+                        product.ProductUrl, product.ImageUrl
+                    );
+                    var resultRow = document.getElementById("resultRow");
+                    resultRow.appendChild(htmlProductCard);
+                });
+
+                function generateComplexHtml(title, price, productUrl, imageUrl) {
+                    @* console.log(title);console.log(price);console.log(productUrl);console.log(imageUrl); *@
+                    // Create a div container
+                    const container = document.createElement('div');
+                    container.classList.add('col-md-4');
+
+                    const cardContainer = document.createElement('div');
+                    cardContainer.classList.add('card');
+
+                    const productImage = document.createElement('img');
+                    productImage.classList.add('card-img-top');
+                    productImage.src = imageUrl;
+
+                    const cardBody = document.createElement('div');
+                    cardBody.classList.add('card-body');
+
+                    const productTitle = document.createElement('h5');
+                    productTitle.classList.add('card-title');
+                    productTitle.textContent = title;
+                    
+                    const productPrice = document.createElement('p');
+                    productPrice.classList.add('card-text');
+                    productPrice.textContent = price;
+
+                    const productLink = document.createElement('a');
+                    productLink.classList.add('btn');
+                    productLink.classList.add('btn-primary');
+                    productLink.textContent = 'View Details';
+                    productLink.href = productUrl;
+
+                    cardBody.appendChild(productTitle);
+                    cardBody.appendChild(productPrice);
+                    cardBody.appendChild(productLink);
+
+                    cardContainer.appendChild(productImage);
+                    cardContainer.appendChild(cardBody);
+
+                    container.appendChild(cardContainer);
+
+                    return container;
+                }
+                
+            },
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
+            }
+        });
+        }
+    }
+
+</script>
