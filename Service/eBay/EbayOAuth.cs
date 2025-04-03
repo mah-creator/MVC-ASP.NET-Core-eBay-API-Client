@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -11,17 +12,21 @@ public class EbayOAuth
     // Most recently granted token
     private static string token;
     // The lease time for the most recent token
-    private static int tokenLeastTime = 0;
+    public static int tokenLeastTime = 0;
     // Issuance time (in milliseconds) of the most recent token 
-    private static long tokenIssuance = 0;
+    public static long tokenIssuance = 0;
+    // This value is set every time the CurrentSeconds() method is called
+    public static long currentSeconds;
     // subtracted from lease time when determining a token expiry as an additional safety measure
     private static int GUARD_PERIOD = 720; 
 
     private HttpClient _ebayOAuthClient;
+    private ILogger<EbayOAuth> _logger;
 
-    public EbayOAuth(HttpClient eBayOAuthClient)
+    public EbayOAuth(HttpClient eBayOAuthClient, ILogger<EbayOAuth> logger)
     {
         _ebayOAuthClient = eBayOAuthClient;
+        _logger = logger;
     }
     public async Task<string> GetAccessTokenAsync()
     {
@@ -39,16 +44,14 @@ public class EbayOAuth
             "grant_type=client_credentials&scope=https://api.ebay.com/oauth/api_scope", 
             Encoding.UTF8, 
             "application/x-www-form-urlencoded");
-        try
-        {
+
             // Send POST request to get the access token
             var response = await _ebayOAuthClient.PostAsync(tokenUrl, postData);
-
-            // Ensure we got a successful response
-            response.EnsureSuccessStatusCode();
-
             // Read the response content (access token)
             var jsonResponse = await response.Content.ReadAsStringAsync();
+
+        if(response.IsSuccessStatusCode)
+        {
 
             // Deserialize the JSON response
             dynamic responseObject = JsonConvert.DeserializeObject(jsonResponse);
@@ -57,9 +60,14 @@ public class EbayOAuth
             token = responseObject.access_token;
             tokenLeastTime = responseObject.expires_in;
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"An error occurred: {ex.Message}");
+            _logger.LogError($"""
+            {Environment.NewLine}
+            -- Server response --
+            {jsonResponse} {Environment.NewLine}
+            ---- {Environment.NewLine}
+            """);
         }
     }
 
@@ -71,6 +79,7 @@ public class EbayOAuth
     // return the seconds elapsed from unix timestamp
     private static long CurrentSeconds()
     {
-        return (DateTime.UtcNow - DateTime.UnixEpoch).Seconds;
+        currentSeconds = (DateTime.UtcNow - DateTime.UnixEpoch).Seconds;
+        return currentSeconds;
     }
 }

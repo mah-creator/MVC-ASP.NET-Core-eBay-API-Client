@@ -10,10 +10,12 @@ public class EbayClient
     private const int ITEM_LIMIT = 3;
     private readonly HttpClient _httpClient;
     private readonly EbayOAuth _eBayOAuthClient;
-    public EbayClient(HttpClient httpClient, EbayOAuth ebayOAuthClient)
+    private readonly ILogger<EbayClient> _logger;
+    public EbayClient(HttpClient httpClient, EbayOAuth ebayOAuthClient, ILogger<EbayClient> logger)
     {
         _httpClient = httpClient;
         _eBayOAuthClient = ebayOAuthClient;
+        _logger = logger;
     }
 
     public async Task<List<Category>> GetSubcategories(string parentId)
@@ -35,8 +37,15 @@ public class EbayClient
         }
         else
         {
-            Console.WriteLine(_httpClient.DefaultRequestHeaders.Authorization);
-            Console.WriteLine(jsonString);
+            _logger.LogError($"""
+                {Environment.NewLine}
+                Token issued: {EbayOAuth.tokenIssuance} {Environment.NewLine}
+                Token lease : {EbayOAuth.tokenLeastTime} {Environment.NewLine}
+                Current Time: {EbayOAuth.currentSeconds} {Environment.NewLine}
+                -- Server response -- {Environment.NewLine}
+                {jsonString}
+                ---- {Environment.NewLine}
+            """);
         }
         return subcategories;
     }

@@ -3,8 +3,24 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Net.Http.Headers;
 using MVC_API_Client.Service.eBay;
+using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Serilog configuration
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information() // Set the minimum log level
+    .WriteTo.Console()//.Filter.ByExcluding
+    // (
+    //     logEvent => logEvent.Properties.ContainsKey("SourceContext") && 
+    //     logEvent.Properties["SourceContext"].ToString().Contains("MVC_API_Client.Service.eBay")
+    // )
+    .WriteTo.File("logs/eBay.txt", rollingInterval: RollingInterval.Day, levelSwitch: new LoggingLevelSwitch {MinimumLevel = LogEventLevel.Error}) // Log to file with daily rolling
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
