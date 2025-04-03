@@ -12,11 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Serilog configuration
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information() // Set the minimum log level
-    .WriteTo.Console()//.Filter.ByExcluding
-    // (
-    //     logEvent => logEvent.Properties.ContainsKey("SourceContext") && 
-    //     logEvent.Properties["SourceContext"].ToString().Contains("MVC_API_Client.Service.eBay")
-    // )
+    .WriteTo.Console()
     .WriteTo.File("logs/eBay.txt", rollingInterval: RollingInterval.Day, levelSwitch: new LoggingLevelSwitch {MinimumLevel = LogEventLevel.Error}) // Log to file with daily rolling
     .CreateLogger();
 
