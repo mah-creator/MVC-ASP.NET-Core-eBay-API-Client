@@ -9,7 +9,7 @@ public class EbayOAuth
     // Token endpoint
     private static readonly string tokenUrl = "https://api.ebay.com/identity/v1/oauth2/token";
     // a stopwatch to monitor the lifespan of the most recent token
-    public static Stopwatch tokenLifeSpan;
+    public static Stopwatch tokenLifeSpan = new Stopwatch();
     // Most recently granted token
     private static string token;
     // The lease time for the most recent token
@@ -27,7 +27,7 @@ public class EbayOAuth
     }
     public async Task<string> GetAccessTokenAsync()
     {
-        if(((int) tokenLifeSpan.Elapsed.TotalSeconds) >= (tokenLeastTime - GUARD_PERIOD))
+        if( ((int)tokenLifeSpan.Elapsed.TotalSeconds) >= (tokenLeastTime - GUARD_PERIOD) )
             await MintToken();
         return token;
     }
