@@ -39,9 +39,8 @@ public class EbayClient
         {
             _logger.LogError($"""
                 {Environment.NewLine}
-                Token issued: {EbayOAuth.tokenIssuance} {Environment.NewLine}
-                Token lease : {EbayOAuth.tokenLeastTime} {Environment.NewLine}
-                Current Time: {EbayOAuth.currentSeconds} {Environment.NewLine}
+                Token lifespan  : {EbayOAuth.tokenLifeSpan} {Environment.NewLine}
+                Token lease time: {EbayOAuth.tokenLeastTime} {Environment.NewLine}
                 -- Server response -- {Environment.NewLine}
                 {jsonString}
                 ---- {Environment.NewLine}
