@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,7 +12,6 @@ public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
     private readonly EbayClient _ebayClient;
-    private IndexViewModel _indexViewModel;
 
     public HomeController(ILogger<HomeController> logger, EbayClient ebayClient)
     {
@@ -21,18 +21,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        IndexViewModel model = new IndexViewModel 
-        {
-            Options = new List<SelectListItem>
-            {
-                new SelectListItem {Text = "1", Value = "1"},
-                new SelectListItem {Text = "2", Value = "2"}
-            },
-            SelectedValue = 0
-        };
-
-        _indexViewModel = model;
-        return View(model);
+        return View(new IndexViewModel());
     }
 
     public IActionResult Privacy()
@@ -50,6 +39,15 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [HttpPost]
+    public IActionResult SearchItems()
+    {
+        byte[] buff = new byte[500];
+        HttpContext.Request.Body.ReadAsync(buff, 0, buff.Length);
+        Console.WriteLine(Encoding.Default.GetString(buff));
+        return RedirectToAction("Index");
     }
 
     [HttpGet]

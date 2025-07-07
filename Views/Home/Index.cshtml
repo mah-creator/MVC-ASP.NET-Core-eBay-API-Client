@@ -1,189 +1,300 @@
 ﻿@model IndexViewModel;
+@using MVC_API_Client.Service.eBay;
 @{
     ViewData["Title"] = "Home Page";
 }
-<!-- Main Container -->
-<div class="container mt-5">
 
-    <!-- Title Section -->
-    <h1 class="text-center mb-4">Search eBay by Category</h1>
+<div class="min-h-screen bg-gray-50">
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                Search eBay by Category
+            </h1>
+            <p class="text-xl text-gray-600">
+                Find the best deals across different eBay marketplaces
+            </p>
+        </div>
 
-    <!-- Search Filter Section -->
-    <div class="filter-section">
-        <form id="searchForm" action="" method="GET">
-            <div class="row">
-                <!-- Marketplace Filter -->
-                <div class="col-md-4">
-                    <div class="filterCriteriaContainer" id="market-place-container">
-                        <label for="market-place">Marketplace</label>
-                        <select title="Disabled for demo purposes" name="Marketplace" id="market-place" class="form-control demo-disabled" disabled>
-                            <option value="AU">AU</option>
-                        </select>
-                    </div>
+        <!-- Search Form -->
+        <div id="searchForm" action="" method="GET" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Marketplace -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">
+                        <svg class="inline h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Marketplace
+                    </label>
+                    <select title="Disabled for demo purposes" disabled name="Marketplace" id="market-place" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <option value="AU">Australia (AU)</option>
+                    </select>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="filterCriteriaContainer" id="category-container">
-                        <label for="category">Category</label>
-                        <select name="Category" id="category" class="form-control" onchange="onCategoryChange()">
-                            <option value="0">-- select a category --</option>
-                            <option value="165">Drives, Storage & Blank Media</option>
-                            <option value="31530">Laptop & Desktop Accessories</option>
-                            <option value="11176">Home Networking & Connectivity</option>
-                        </select>
-                    </div>
+                <!-- Category -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">
+                        <svg class="inline h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Category
+                    </label>
+                    <select name="Category" id="category" onchange="onCategoryChange()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <option value="0">-- select a category --</option>
+                        <option value="165">Drives, Storage & Blank Media</option>
+                        <option value="31530">Laptop & Desktop Accessories</option>
+                        <option value="11176">Home Networking & Connectivity</option>
+                    </select>
                 </div>
 
-                <!-- Subcategory Filter -->
-                <div class="col-md-4">
-                    <div class="filterCriteriaContainer" id="subcategory-container">
-                        <label for="subcategory">Subcategory</label>
-                        <select name="Subcategory" id="subcategory" class="form-control" onchange="onSubcategoryChange()">
-                        </select>
-                    </div>
+                <!-- Subcategory -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">
+                        <svg class="inline h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        Subcategory
+                    </label>
+                    <select name="Subcategory" id="subcategory" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    </select>
                 </div>
             </div>
 
-            <!-- Search Button -->
-            @* <div class="text-center mt-3">
-                <button type="submit" class="btn btn-primary">Search</button>
-            </div> *@
-        </form>
-    </div>
+            <div class="mt-6 flex justify-center">
+                <button onclick="onSubcategoryChange()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-all transform hover:scale-105 flex items-center">
+                    <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search Products
+                </button>
+            </div>
+        </div>
 
-    <!-- Product Results Section -->
-    <div id="resultContainer" class="mt-5" style="display: @Model.TEST_RESULT_VISIBILITY;">
-        <h3 class="text-center">Search Results</h3>
-        <p class="text-center">Here will be the search results based on the selected filters.</p>
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Search Results</h2>
+            <div id="filter-verb" class="text-sm text-gray-600"></div>
+        </div>
 
-        <!-- Example Product Cards (replace with dynamic data) -->
-        <div class="row" id="resultRow">
-            @* <div class="col-md-4">
-                <div class="card">
-                    <img src="@product.ImageUrl" class="card-img-top" alt="IMAGEALT_FILL_HERE">
-                    <div class="card-body">
-                        <h5 class="card-title">@product.Title</h5>
-                        <p class="card-text">@product.Price</p>
-                        <a href="@product.ProductUrl" class="btn btn-primary">View Details</a>
-                    </div>
-                </div>
-            </div> *@
+        <p class="text-gray-600 mb-8 text-center">Here will be the search results based on the selected filters.</p>
+
+
+        <!-- Search Results Section -->
+        <div class="mb-8">
+            <div id="resultContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+            </div>
         </div>
     </div>
 </div>
 
-<link rel="stylesheet" href="~/css/style.css">
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+</style>
 
 <script type="text/javascript">
-    function onCategoryChange() {
+        function onCategoryChange() {
         var selectedValue = $('#category').val();
-        if(selectedValue != 0)
-        {
-        document.getElementById("resultRow").style = "display: none";
-        $.ajax({
-            url: '@Url.Action("GetSubcategories", "Home")', // URL to your controller action
-            type: 'GET', // or 'POST' depending on your requirement
-            data: { selectedValue: selectedValue }, // Pass selected value to the action
-            dataType: 'json', // Specify that the response will be in JSON format
-            success: function (data) {
-                var subcategoryDropdown = document.getElementById("subcategory");
-                document.querySelectorAll("#subcategory option").forEach(option => option.remove())
-                let resArrayObj = data.Result;
-                let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+        if (selectedValue != 0) {
+            //document.getElementById("resultContainer").style = "display: none";
+            $.ajax({
+                url: '@Url.Action("GetSubcategories", "Home")', // URL to your controller action
+                type: 'GET', // or 'POST' depending on your requirement
+                data: { selectedValue: selectedValue }, // Pass selected value to the action
+                dataType: 'json', // Specify that the response will be in JSON format
+                success: function (data) {
+                    var subcategoryDropdown = document.getElementById("subcategory");
+                    document.querySelectorAll("#subcategory option").forEach(option => option.remove())
+                    let resArrayObj = data.Result;
+                    let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
 
-                @*  render the following option as the first option
-                    <option value="0">-- select a category --</option> 
-                *@
-                var selectSubcategoryOption = document.createElement("option"); selectSubcategoryOption.value = 0; selectSubcategoryOption.textContent = "-- select a subcategory --";
-                subcategoryDropdown.appendChild(selectSubcategoryOption);
-                resArray.forEach(subcategory => {
-                    var option = document.createElement("option");
-                    option.value = subcategory.categoryId;
-                    option.textContent = subcategory.categoryName;
-                    subcategoryDropdown.appendChild(option);
-                });
-                
-                
-            },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
-            }
-        });
+                    // render the following option as the first option
+                    // < option value = "0" > --select a category--</option >
+                    //
+                    var selectSubcategoryOption = document.createElement("option"); selectSubcategoryOption.value = 0; selectSubcategoryOption.textContent = "-- select a subcategory --";
+                    subcategoryDropdown.appendChild(selectSubcategoryOption);
+                    resArray.forEach(subcategory => {
+                        var option = document.createElement("option");
+                        option.value = subcategory.categoryId;
+                        option.textContent = subcategory.categoryName;
+                        subcategoryDropdown.appendChild(option);
+                    });
+
+
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                }
+            });
         }
     }
     function onSubcategoryChange() {
+        var categoryText = $('#category option:selected').text();
+        var marketplaceText = $('#market-place option:selected').text();
         var selectedValue = $('#subcategory').val();
-        if(selectedValue != 0)
-        {
-        document.getElementById("resultRow").style = "display: flex";
-        document.getElementById("resultRow").innerHTML = ""
-        $.ajax({
-            url: '@Url.Action("GetItems", "Home")', // URL to your controller action
-            type: 'GET', // or 'POST' depending on your requirement
-            data: { selectedValue: selectedValue }, // Pass selected value to the action
-            dataType: 'json', // Specify that the response will be in JSON format
-            success: function (data) {
-                var subcategoryDropdown = document.getElementById("subcategory");
-                let resArrayObj = data.Result;
-                let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+        if (selectedValue != 0) {
+            // document.getElementById("resultRow").style = "display: flex";
+            document.getElementById("resultContainer").innerHTML = "";
+            $.ajax({
+                url: '@Url.Action("GetItems", "Home")', // URL to your controller action
+                type: 'GET', // or 'POST' depending on your requirement
+                data: { selectedValue: selectedValue }, // Pass selected value to the action
+                dataType: 'json', // Specify that the response will be in JSON format
+                success: function (data) {
+                    var subcategoryDropdown = document.getElementById("subcategory");
+                    let resArrayObj = data.Result;
+                    let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
 
-                resArray.forEach(product => {
-                    var htmlProductCard = generateComplexHtml(
-                        product.Title, product.Price, 
-                        product.ProductUrl, product.ImageUrl
-                    );
-                    var resultRow = document.getElementById("resultRow");
-                    resultRow.appendChild(htmlProductCard);
-                });
-
-                function generateComplexHtml(title, price, productUrl, imageUrl) {
-                    @* console.log(title);console.log(price);console.log(productUrl);console.log(imageUrl); *@
-                    // Create a div container
-                    const container = document.createElement('div');
-                    container.classList.add('col-md-4');
-
-                    const cardContainer = document.createElement('div');
-                    cardContainer.classList.add('card');
-
-                    const productImage = document.createElement('img');
-                    productImage.classList.add('card-img-top');
-                    productImage.src = imageUrl;
-
-                    const cardBody = document.createElement('div');
-                    cardBody.classList.add('card-body');
-
-                    const productTitle = document.createElement('h5');
-                    productTitle.classList.add('card-title');
-                    productTitle.textContent = title;
-                    
-                    const productPrice = document.createElement('p');
-                    productPrice.classList.add('card-text');
-                    productPrice.textContent = price;
-
-                    const productLink = document.createElement('a');
-                    productLink.classList.add('btn');
-                    productLink.classList.add('btn-primary');
-                    productLink.textContent = 'View Details';
-                    productLink.href = productUrl;
-
-                    cardBody.appendChild(productTitle);
-                    cardBody.appendChild(productPrice);
-                    cardBody.appendChild(productLink);
-
-                    cardContainer.appendChild(productImage);
-                    cardContainer.appendChild(cardBody);
-
-                    container.appendChild(cardContainer);
-
-                    return container;
+                    resArray.forEach(product => {
+                        var htmlProductCard = generateComplexHtml(
+                            product.Title, product.Price,
+                            product.ProductUrl, product.ImageUrl
+                        );
+                        var resultRow = document.getElementById("resultContainer");
+                        resultRow.appendChild(htmlProductCard);
+                    });
+                    let filterVerb = $('#filter-verb');
+                    filterVerb.text("Showing results for " + categoryText + " in " + marketplaceText);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
                 }
-                
-            },
-            error: function (xhr, status, error) {
-                console.error('Error:', error);
-            }
-        });
+            });
         }
+    }
+
+    function generateComplexHtml(title, price, productUrl, imageUrl) {
+        // Parent container with group class
+        const hoverContainer = document.createElement("div");
+        hoverContainer.className = "group";
+
+        // Card element that will respond to group hover
+        const container = document.createElement("div");
+        container.className = "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 group-hover:shadow-lg";
+
+        const imageWrapper = document.createElement("div");
+        imageWrapper.className = "relative";
+
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = title;
+        img.className = "w-full h-60 object-cover group-hover:scale-105 transition-transform duration-300";
+
+        const starWrapperOuter = document.createElement("div");
+        starWrapperOuter.className = "absolute top-4 right-4";
+
+        const starWrapperInner = document.createElement("div");
+        starWrapperInner.className = "bg-white/90 backdrop-blur-sm rounded-full p-2";
+
+        const starSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        starSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        starSvg.setAttribute("width", "24");
+        starSvg.setAttribute("height", "24");
+        starSvg.setAttribute("viewBox", "0 0 24 24");
+        starSvg.setAttribute("fill", "none");
+        starSvg.setAttribute("stroke", "currentColor");
+        starSvg.setAttribute("stroke-width", "2");
+        starSvg.setAttribute("stroke-linecap", "round");
+        starSvg.setAttribute("stroke-linejoin", "round");
+        starSvg.className = "lucide lucide-star h-4 w-4 text-yellow-500";
+
+        const starPolygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        starPolygon.setAttribute("points", "12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2");
+        starSvg.appendChild(starPolygon);
+
+        starWrapperInner.appendChild(starSvg);
+        starWrapperOuter.appendChild(starWrapperInner);
+        imageWrapper.appendChild(img);
+        imageWrapper.appendChild(starWrapperOuter);
+
+        const content = document.createElement("div");
+        content.className = "p-6";
+
+        const titleHeader = document.createElement("h3");
+        titleHeader.className = "text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors";
+        titleHeader.textContent = title;
+
+        const priceRow = document.createElement("div");
+        priceRow.className = "flex items-center justify-between mb-4";
+
+        const priceDiv = document.createElement("div");
+        priceDiv.className = "text-2xl font-bold text-blue-600";
+        priceDiv.textContent = price;
+
+        const location = document.createElement("div");
+        location.className = "flex items-center text-sm text-gray-500";
+
+        const pinSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        pinSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        pinSvg.setAttribute("width", "24");
+        pinSvg.setAttribute("height", "24");
+        pinSvg.setAttribute("viewBox", "0 0 24 24");
+        pinSvg.setAttribute("fill", "none");
+        pinSvg.setAttribute("stroke", "currentColor");
+        pinSvg.setAttribute("stroke-width", "2");
+        pinSvg.setAttribute("stroke-linecap", "round");
+        pinSvg.setAttribute("stroke-linejoin", "round");
+        pinSvg.className = "lucide lucide-map-pin h-4 w-4 mr-1";
+
+        const pinPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        pinPath.setAttribute("d", "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z");
+        const pinCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        pinCircle.setAttribute("cx", "12");
+        pinCircle.setAttribute("cy", "10");
+        pinCircle.setAttribute("r", "3");
+
+        pinSvg.appendChild(pinPath);
+        pinSvg.appendChild(pinCircle);
+        location.appendChild(pinSvg);
+        location.appendChild(document.createTextNode("AU"));
+
+        priceRow.appendChild(priceDiv);
+        priceRow.appendChild(location);
+
+        const button = document.createElement("a");
+        button.className = "w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg font-medium transition-all flex items-center justify-center group-hover:shadow-md";
+        button.href = productUrl;
+
+        const eyeSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        eyeSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        eyeSvg.setAttribute("width", "24");
+        eyeSvg.setAttribute("height", "24");
+        eyeSvg.setAttribute("viewBox", "0 0 24 24");
+        eyeSvg.setAttribute("fill", "none");
+        eyeSvg.setAttribute("stroke", "currentColor");
+        eyeSvg.setAttribute("stroke-width", "2");
+        eyeSvg.setAttribute("stroke-linecap", "round");
+        eyeSvg.setAttribute("stroke-linejoin", "round");
+        eyeSvg.className = "lucide lucide-eye mr-2 h-4 w-4";
+
+        const eyePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        eyePath.setAttribute("d", "M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z");
+        const eyeCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        eyeCircle.setAttribute("cx", "12");
+        eyeCircle.setAttribute("cy", "12");
+        eyeCircle.setAttribute("r", "3");
+
+        eyeSvg.appendChild(eyePath);
+        eyeSvg.appendChild(eyeCircle);
+        button.appendChild(eyeSvg);
+        button.appendChild(document.createTextNode("View Details"));
+
+        content.appendChild(titleHeader);
+        content.appendChild(priceRow);
+        content.appendChild(button);
+
+        container.appendChild(imageWrapper);
+        container.appendChild(content);
+
+        hoverContainer.appendChild(container);
+
+        return hoverContainer;
     }
 
 </script>
