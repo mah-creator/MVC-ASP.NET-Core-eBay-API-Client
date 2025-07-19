@@ -1,5 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.Net.Http.Headers;
 using MVC_API_Client.Service.eBay;
@@ -19,6 +21,28 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 // Add services to the container.
+
+// Add rate limiter service
+/*
+ * The numbers below are picked randomly (based on trial and error).
+ * I still haven't spent much time researching this topic. Thus,
+ * 
+ * TODO: implement a more realistic rate limiting policy
+ */
+builder.Services.AddRateLimiter(options =>
+{
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+    RateLimitPartition.GetFixedWindowLimiter(
+	   httpContext.Request.Headers.Host.ToString(),
+	   factory: partition => new FixedWindowRateLimiterOptions
+	   {
+		  AutoReplenishment = true,
+		  PermitLimit = 10,
+		  QueueLimit = 0,
+		  Window = TimeSpan.FromSeconds(1)
+	   }));
+});
+
 builder.Services.AddControllersWithViews();
 
 // eBay brows and search API client
@@ -38,6 +62,12 @@ builder.Services.AddHttpClient<EbayOAuth>(client => {
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine(context.Request.Host);
+    await next(context);
+});
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -46,8 +76,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseAuthorization();
 
