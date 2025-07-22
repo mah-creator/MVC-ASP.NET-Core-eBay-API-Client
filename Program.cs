@@ -33,13 +33,13 @@ builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
     RateLimitPartition.GetFixedWindowLimiter(
-	   httpContext.Request.Headers.Host.ToString(),
+	   string.Format("{0}", httpContext.Request.Cookies.FirstOrDefault().Value),
 	   factory: partition => new FixedWindowRateLimiterOptions
 	   {
 		  AutoReplenishment = true,
-		  PermitLimit = 10,
+		  PermitLimit = 4,
 		  QueueLimit = 0,
-		  Window = TimeSpan.FromSeconds(1)
+		  Window = TimeSpan.FromSeconds(1.24)
 	   }));
 });
 
@@ -62,9 +62,20 @@ builder.Services.AddHttpClient<EbayOAuth>(client => {
 
 var app = builder.Build();
 
+/*
+ * Add a guid coockie to a request from a new client (i.e., if the request doesn't already have that coockie)
+ * this cookie is used as an id in the rate limiter partitioning
+ */
 app.Use(async (context, next) =>
 {
-    Console.WriteLine(context.Request.Host);
+    if (context.Request.Cookies.Count == 0)
+	   context.Response.Cookies.Append("guid", Guid.NewGuid().ToString(), new()
+	   {
+		  Path = "/",
+		  HttpOnly = true,
+		  SameSite = Microsoft.AspNetCore.Http.SameSiteMode.Lax
+	   });
+
     await next(context);
 });
 
@@ -75,7 +86,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 app.UseHttpsRedirection();
 app.UseRouting();
