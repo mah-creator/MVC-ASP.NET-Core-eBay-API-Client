@@ -99,75 +99,67 @@
 </style>
 
 <script type="text/javascript">
-        function onCategoryChange() {
-        var selectedValue = $('#category').val();
-        if (selectedValue != 0) {
-            //document.getElementById("resultContainer").style = "display: none";
-            $.ajax({
-                url: '@Url.Action("GetSubcategories", "Home")', // URL to your controller action
-                type: 'GET', // or 'POST' depending on your requirement
-                data: { selectedValue: selectedValue }, // Pass selected value to the action
-                dataType: 'json', // Specify that the response will be in JSON format
-                success: function (data) {
-                    var subcategoryDropdown = document.getElementById("subcategory");
-                    document.querySelectorAll("#subcategory option").forEach(option => option.remove())
-                    let resArrayObj = data.Result;
-                    let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+            function onCategoryChange() {
+        const selectedValue = document.getElementById('category').value;
 
-                    // render the following option as the first option
-                    // < option value = "0" > --select a category--</option >
-                    //
-                    var selectSubcategoryOption = document.createElement("option"); selectSubcategoryOption.value = 0; selectSubcategoryOption.textContent = "-- select a subcategory --";
-                    subcategoryDropdown.appendChild(selectSubcategoryOption);
+        if (selectedValue !== "0") {
+            fetch(`/Home/GetSubcategories?selectedValue=${selectedValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    const subcategoryDropdown = document.getElementById("subcategory");
+                    subcategoryDropdown.innerHTML = ''; // Clear existing options
+
+                    const defaultOption = document.createElement("option");
+                    defaultOption.value = 0;
+                    defaultOption.textContent = "-- select a subcategory --";
+                    subcategoryDropdown.appendChild(defaultOption);
+
+                    const resArray = Object.values(data.Result);
                     resArray.forEach(subcategory => {
-                        var option = document.createElement("option");
+                        const option = document.createElement("option");
                         option.value = subcategory.categoryId;
                         option.textContent = subcategory.categoryName;
                         subcategoryDropdown.appendChild(option);
                     });
-
-
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error:', error);
-                }
-            });
+                })
+                .catch(error => console.error('Error fetching subcategories:', error));
         }
     }
+
     function onSubcategoryChange() {
-        var categoryText = $('#category option:selected').text();
-        var marketplaceText = $('#market-place option:selected').text();
-        var selectedValue = $('#subcategory').val();
-        if (selectedValue != 0) {
-            // document.getElementById("resultRow").style = "display: flex";
-            document.getElementById("resultContainer").innerHTML = "";
-            $.ajax({
-                url: '@Url.Action("GetItems", "Home")', // URL to your controller action
-                type: 'GET', // or 'POST' depending on your requirement
-                data: { selectedValue: selectedValue }, // Pass selected value to the action
-                dataType: 'json', // Specify that the response will be in JSON format
-                success: function (data) {
-                    var subcategoryDropdown = document.getElementById("subcategory");
-                    let resArrayObj = data.Result;
-                    let resArray = Array.from(Object.entries(resArrayObj), ([key, value]) => value);
+        const selectedCategory = document.getElementById("category");
+        const selectedMarketplace = document.getElementById("market-place");
+        const subcategory = document.getElementById("subcategory");
 
+        const categoryText = selectedCategory.options[selectedCategory.selectedIndex].text;
+        const marketplaceText = selectedMarketplace.options[selectedMarketplace.selectedIndex].text;
+        const selectedValue = subcategory.value;
+
+        if (selectedValue !== "0") {
+            const resultContainer = document.getElementById("resultContainer");
+            resultContainer.innerHTML = ""; // Clear old results
+
+            fetch(`/Home/GetItems?selectedValue=${selectedValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resArray = Object.values(data.Result);
                     resArray.forEach(product => {
-                        var htmlProductCard = generateComplexHtml(
-                            product.Title, product.Price,
-                            product.ProductUrl, product.ImageUrl
+                        const card = generateComplexHtml(
+                            product.Title,
+                            product.Price,
+                            product.ProductUrl,
+                            product.ImageUrl
                         );
-                        var resultRow = document.getElementById("resultContainer");
-                        resultRow.appendChild(htmlProductCard);
+                        resultContainer.appendChild(card);
                     });
-                    let filterVerb = $('#filter-verb');
-                    filterVerb.text("Showing results for " + categoryText + " in " + marketplaceText);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error:', error);
-                }
-            });
+
+                    const filterVerb = document.getElementById("filter-verb");
+                    filterVerb.textContent = `Showing results for ${categoryText} in ${marketplaceText}`;
+                })
+                .catch(error => console.error('Error fetching items:', error));
         }
     }
+
 
     function generateComplexHtml(title, price, productUrl, imageUrl) {
         // Parent container with group class
